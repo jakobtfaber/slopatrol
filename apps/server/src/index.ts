@@ -1,4 +1,4 @@
-import { isNormalEvent, type NormalEvent } from "@slopwatch/events";
+import { isNormalEvent, type NormalEvent } from "@slopatrol/events";
 
 export const acceptEvent = (event: unknown): NormalEvent => {
   if (!isNormalEvent(event)) {
@@ -17,4 +17,4 @@ const _stub = acceptEvent({
   coding_agent: "claude-code",
   cwd: process.cwd(),
 });
-console.log("slopwatch server stub");
+console.log("slopatrol server stub");

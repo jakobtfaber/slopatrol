@@ -1,5 +1,5 @@
 {
-  "name": "@slopwatch/events",
+  "name": "@slopatrol/events",
   "version": "0.0.0",
   "private": true,
   "type": "module",

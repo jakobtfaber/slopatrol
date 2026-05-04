@@ -1,10 +1,10 @@
-# Slopwatch v1 Architecture Decisions
+# Slopatrol v1 Architecture Decisions
 
 Partial notes from a design interview. Captures decisions reached so far and the questions still open. Pick up from the open questions list.
 
 Companion to [`coding-agent-ingestion.md`](./coding-agent-ingestion.md) (capture-surface research) and [`../CONTEXT.md`](../CONTEXT.md) (glossary).
 
-**Terminology note.** Earlier drafts of this document used "sidecar" / "slopwatch-capture" for the on-machine capture component and "backend" / "slopwatch-server" for the self-hosted process. The canonical names are now **Listener** and **Server** respectively (see `CONTEXT.md`). Older phrasings below are left intact for historical clarity; treat the glossary as authoritative.
+**Terminology note.** Earlier drafts of this document used "sidecar" / "slopatrol-capture" for the on-machine capture component and "backend" / "slopatrol-server" for the self-hosted process. The canonical names are now **Listener** and **Server** respectively (see `CONTEXT.md`). Older phrasings below are left intact for historical clarity; treat the glossary as authoritative.
 
 ---
 
@@ -18,7 +18,7 @@ One mode. No SaaS. No local-only fallback. Solo use is a degenerate "team of one
 
 ### 2. Visibility: org-wide by default
 
-When a dev opts into Slopwatch, their sessions become visible across the org. Individual privacy is explicitly traded for org-level value. On-prem self-hosting is the mitigation — data never leaves the org's infrastructure.
+When a dev opts into Slopatrol, their sessions become visible across the org. Individual privacy is explicitly traded for org-level value. On-prem self-hosting is the mitigation — data never leaves the org's infrastructure.
 
 ### 3. DRI (Directly Responsible Individual) is first-class
 
@@ -34,7 +34,7 @@ A manager or DRI can watch a running session. Originally scoped to ~100ms via fs
 
 The on-machine capture component is **not** a pre-existing background daemon. It is a per-session subprocess whose lifecycle is driven by the agent's own hook/extension system.
 
-- **Claude Code / Codex / Copilot**: `SessionStart` hook launches `slopwatch-capture --session-id=... --agent=...` as a detached subprocess. That subprocess tails the agent's JSONL, receives subsequent hook fires on a local socket, POSTs normalized events to the backend, exits on `SessionEnd`.
+- **Claude Code / Codex / Copilot**: `SessionStart` hook launches `slopatrol-capture --session-id=... --agent=...` as a detached subprocess. That subprocess tails the agent's JSONL, receives subsequent hook fires on a local socket, POSTs normalized events to the backend, exits on `SessionEnd`.
 - **Pi / OpenCode**: in-process extension/plugin loaded into the agent itself. Posts directly to the backend. No subprocess at all.
 
 **Why.** A pure "hook fires curl" model is insufficient — hooks don't carry full message content (Claude Code / Codex / Copilot) and nothing streams between hook fires while the model is generating. A pre-existing daemon solves that, but introduces a "dev forgot to start it" failure mode and a non-trivial install ceremony (launchd/systemd/Windows service). The per-session sidecar threads the needle: the hook _is_ the trigger that starts the process, so forgetting is impossible, and the process lives only during sessions — no always-on footprint.
@@ -47,7 +47,7 @@ OIDC is out of scope for v1. Instead:
 
 1. Admin opens the self-hosted backend's admin UI, clicks "Add user," types a name + email.
 2. Backend mints a long-lived bearer token. Admin hands it to the dev out-of-band (Slack, email).
-3. Dev runs `slopwatch login <token>`. Sidecar stores it in the OS keychain (file fallback with 0600 perms on headless Linux).
+3. Dev runs `slopatrol login <token>`. Sidecar stores it in the OS keychain (file fallback with 0600 perms on headless Linux).
 4. Sidecar sends it as `Authorization: Bearer ...` on every request.
 
 **Why.** OIDC device flow against an org IdP is the "right" answer but expensive to build for v1. Admin-minted tokens give trustworthy identity (each token bound to a user record), clean revocation, and a clean upgrade path: OIDC later becomes "another issuer of the same kind of token." The sidecar's auth surface stays a bearer token the whole time.
@@ -60,7 +60,7 @@ One Go/Rust binary containing backend HTTP server + embedded frontend static ass
 
 **Why separate.** The database must outlive app-version changes, be backed up independently, and be reasoned about as its own asset. Embedded SQLite would couple those lifecycles.
 
-**What the admin does.** Provisions a Postgres instance (existing one, RDS, self-hosted, whatever they already know how to run). Runs `./slopwatch-server --db=postgres://...`. That's it.
+**What the admin does.** Provisions a Postgres instance (existing one, RDS, self-hosted, whatever they already know how to run). Runs `./slopatrol-server --db=postgres://...`. That's it.
 
 **Rejected.** Docker Compose as the default shape (too opinionated about where Postgres comes from). K8s manifests as the only option (excludes smaller orgs). SQLite-default hybrid (violates the "separate deployable" constraint).
 
@@ -120,7 +120,7 @@ Roughly in priority order for continuing the design:
 7. **Frontend stack.** Bundled into the binary as static assets — but React SPA? Server-rendered? HTMX? Affects dev velocity and the "single binary" build pipeline.
 8. **Backend language/runtime.** Go, Rust, Node? Affects sidecar consistency (same language across sidecar + backend?) and the in-process TypeScript extensions for Pi/OpenCode (those _must_ be JS/TS).
 9. **Sidecar language.** Must run on dev machines across macOS/Linux/Windows with minimal install friction. Node (available wherever the agents are installed)? Go (single static binary per OS)? Rust (same)?
-10. **`npx slopwatch install` flow.** Detect installed agents, wire up per-agent hooks/extensions idempotently, store backend URL + token. Exact UX not drawn.
+10. **`npx slopatrol install` flow.** Detect installed agents, wire up per-agent hooks/extensions idempotently, store backend URL + token. Exact UX not drawn.
 11. **Identity binding beyond the token.** Does the sidecar send extra context (git email, OS user, hostname, cwd, repo)? Which of those are useful for the DRI view vs. noise?
 12. **Cost/token tracking.** Codex and Claude Code emit token usage; Copilot JSONL probably does too. Normalizing across providers (OpenAI vs Anthropic pricing, cached tokens, reasoning tokens) is its own small project.
 13. **Admin UI scope.** Minimally: add/revoke users, view system health, configure retention. What else needs to be in v1?
@@ -133,12 +133,12 @@ Roughly in priority order for continuing the design:
 ┌───────────────────────────────┐        ┌───────────────────────────┐
 │ Developer machine             │        │ Org-operated self-hosted  │
 │                               │        │                           │
-│  Coding agent (Claude Code,   │        │  slopwatch-server         │
+│  Coding agent (Claude Code,   │        │  slopatrol-server         │
 │  Codex, Pi, OpenCode, Copilot)│        │  (single binary)          │
 │   │                           │        │   - HTTP API              │
 │   │ hook fires / plugin loads │        │   - Static frontend       │
 │   ▼                           │        │   - Stateless             │
-│  slopwatch-capture            │──POST─▶│                           │
+│  slopatrol-capture            │──POST─▶│                           │
 │  (per-session subprocess,     │ events │          │                │
 │   or in-process extension     │        │          ▼                │
 │   for Pi/OpenCode)            │◀polls──│  Postgres (separate       │

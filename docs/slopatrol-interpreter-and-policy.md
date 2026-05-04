@@ -1,18 +1,18 @@
-# Slopwatch Interpreter and Policy Layer
+# Slopatrol Interpreter and Policy Layer
 
 ## Purpose
 
-Slopwatch currently describes the capture foundation for coding-agent activity:
+Slopatrol currently describes the capture foundation for coding-agent activity:
 Listeners observe coding agents, normalize activity into Events, and send those
 Events to the Server for storage and review.
 
-To become more than an observer, Slopwatch needs a judgment layer. That layer
+To become more than an observer, Slopatrol needs a judgment layer. That layer
 should interpret Sessions and Turns, identify waste or risk, and route the
 right work to humans for review.
 
 In short:
 
-> Slopwatch should not merely show what agents did. It should tell humans which
+> Slopatrol should not merely show what agents did. It should tell humans which
 > agent Sessions deserve attention, why, and what risk or waste they contain.
 
 ## Product Direction
@@ -154,7 +154,7 @@ Useful questions:
 - Which tool-use patterns predict bad outcomes?
 - Which subagent patterns are useful versus wasteful?
 
-This turns Slopwatch from a log viewer into an accountability and learning
+This turns Slopatrol from a log viewer into an accountability and learning
 system for coding-agent usage.
 
 ### 8. Human Feedback Loop
@@ -187,7 +187,7 @@ The assessment should include:
 - Review urgency.
 - Evidence links back to Events.
 
-This milestone avoids enforcement at first. It proves that Slopwatch can turn
+This milestone avoids enforcement at first. It proves that Slopatrol can turn
 captured activity into useful human-readable judgment before adding policy
 actions.
 

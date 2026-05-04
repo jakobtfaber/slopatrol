@@ -103,7 +103,7 @@ The per-user × per-agent matrix is _not_ surfaced on the leaderboard. Decision:
 
 `delta` is a signed fraction (e.g. `+0.23` = up 23% vs last week). Rendered as a percentage with sign, green for positive, red for negative.
 
-Notable: **positive is green** regardless of metric. On a spend leaderboard, "+40% week-over-week" arguably warrants a warning color, not success. The prototype treats "more activity = good" — which is a product stance (Slopwatch celebrates usage) rather than a neutral one (spend going up is neither inherently good nor bad). Worth re-examining before v1.
+Notable: **positive is green** regardless of metric. On a spend leaderboard, "+40% week-over-week" arguably warrants a warning color, not success. The prototype treats "more activity = good" — which is a product stance (Slopatrol celebrates usage) rather than a neutral one (spend going up is neither inherently good nor bad). Worth re-examining before v1.
 
 ### 10. Row affordances: hover highlight, cursor: pointer
 

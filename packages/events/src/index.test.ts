@@ -323,13 +323,13 @@ describe("events", () => {
     });
 
     const request = createEventsRequest({
-      serverUrl: "https://slopwatch.example/events",
+      serverUrl: "https://slopatrol.example/events",
       bearerToken: "token_1",
       events: [event],
     });
 
     expect(request).toEqual({
-      url: "https://slopwatch.example/events",
+      url: "https://slopatrol.example/events",
       init: {
         method: "POST",
         headers: {
@@ -359,7 +359,7 @@ describe("events", () => {
 
     expect(() =>
       createEventsRequest({
-        serverUrl: "https://slopwatch.example/events",
+        serverUrl: "https://slopatrol.example/events",
         bearerToken: " ",
         events: [event],
       }),
@@ -369,7 +369,7 @@ describe("events", () => {
   test("createEventsRequest validates Events before serializing", () => {
     expect(() =>
       createEventsRequest({
-        serverUrl: "https://slopwatch.example/events",
+        serverUrl: "https://slopatrol.example/events",
         bearerToken: "token_1",
         events: [{ ...base, kind: "stub" } as never],
       }),

@@ -5,7 +5,7 @@ import {
   toolEvent,
   turnEvent,
   type NormalEvent,
-} from "@slopwatch/events";
+} from "@slopatrol/events";
 
 const listener = { name: "claude-code", version: "0.0.0" };
 
@@ -59,4 +59,4 @@ export const buildClaudeCodeStubEvents = (cwd: string): NormalEvent[] => {
 };
 
 void sendEvents;
-console.log("slopwatch claude-code listener stub");
+console.log("slopatrol claude-code listener stub");

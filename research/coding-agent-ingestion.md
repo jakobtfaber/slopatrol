@@ -1,6 +1,6 @@
 # Coding Agent Ingestion: Capture Surfaces Across Agents
 
-Research notes for Slopwatch — a self-hosted, open-source observability platform
+Research notes for Slopatrol — a self-hosted, open-source observability platform
 for coding agents. This document captures what we learned about the five target
 agents and why a per-agent ingestion strategy is unavoidable.
 
@@ -89,7 +89,7 @@ The right strategy is **per-agent adapters, each using that agent's most stable 
 
 ### 1. Every agent has a local event bus and an append-only log
 
-Even where the contracts differ, the shape is identical: subscribe to events in-process, or tail an append-only store on disk. This suggests a uniform **adapter interface** inside Slopwatch:
+Even where the contracts differ, the shape is identical: subscribe to events in-process, or tail an append-only store on disk. This suggests a uniform **adapter interface** inside Slopatrol:
 
 ```ts
 interface AgentAdapter {
@@ -132,7 +132,7 @@ For an open-source self-install tool, the install ceremony is the UX. The ceilin
 
 ---
 
-## Implications for Slopwatch v1
+## Implications for Slopatrol v1
 
 1. **Per-agent adapters, normalized internally** (option (c) from the design). No uniform strategy across agents.
 2. **Primary capture per agent:**
@@ -142,7 +142,7 @@ For an open-source self-install tool, the install ceremony is the UX. The ceilin
    - OpenCode → plugin subscribing to session/message/tool events (never touch disk).
    - Copilot → hooks + JSONL tail combined.
 3. **Internal `NormalEvent` schema** is a v1 deliverable, not a v2 refactor.
-4. **`npx slopwatch install`** detects installed agents and wires each correctly; per-agent weirdness never surfaces to the user.
+4. **`npx slopatrol install`** detects installed agents and wires each correctly; per-agent weirdness never surfaces to the user.
 5. **Version pinning and schema-drift handling** must be built in from the start for Claude Code, Copilot, and Pi JSONLs.
 6. **No proxy path in v1.** Revisit for Codex/Pi/OpenCode if granular wire-level model traffic becomes valuable.
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isNormalEvent, sendEvents } from "@slopwatch/events";
+import { isNormalEvent, sendEvents } from "@slopatrol/events";
 import { buildClaudeCodeStubEvents } from "./index";
 
 describe("claude-code listener", () => {

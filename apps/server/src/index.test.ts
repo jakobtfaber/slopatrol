@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { sessionEvent, turnEvent, type NormalEvent } from "@slopwatch/events";
+import { sessionEvent, turnEvent, type NormalEvent } from "@slopatrol/events";
 import { acceptEvent } from "./index";
 
 describe("server", () => {
